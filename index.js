@@ -89,7 +89,7 @@ app.get('/debug-db', async (req, res) => {
 });
 
 // 7. Chạy Server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Render sẽ dùng PORT của nó, máy ông dùng 3000
 app.listen(PORT, () => {
-    console.log(`🚀 Server đang chạy tại: http://127.0.0.1:${PORT}`);
+    console.log(`🚀 Server đang chạy tại cổng: ${PORT}`);
 });
