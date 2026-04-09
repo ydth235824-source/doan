@@ -1,0 +1,9 @@
+[
+  { "MaKhoa": "CNTT", "TenKhoa": "Công nghệ thông tin" },
+  { "MaKhoa": "KT-QTKD", "TenKhoa": "Kinh tế - Quản trị kinh doanh" },
+  { "MaKhoa": "NN", "TenKhoa": "Ngoại ngữ" },
+  { "MaKhoa": "KHCT", "TenKhoa": "Khoa học chính trị" },
+  { "MaKhoa": "N-N", "TenKhoa": "Nông nghiệp" },
+  { "MaKhoa": "SP", "TenKhoa": "Sư Phạm" }
+
+]

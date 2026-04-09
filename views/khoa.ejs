@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="container">
+        <%-include ('navbar')%>
+
+        <div class="card mt-3 shadow border-start border-info border-4">
+            <div class="card-header bg-white fw-bold text-info">
+                <i class="bi bi-building-add"></i> THÊM KHOA MỚI
+            </div>
+            <div class="card-body">
+                <form action="/khoa/them" method="POST" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Mã Khoa</label>
+                        <input type="text" name="MaKhoa" class="form-control" placeholder="Ví dụ: CNTT" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">Tên Khoa</label>
+                        <input type="text" name="TenKhoa" class="form-control" placeholder="Ví dụ: Công nghệ thông tin" required>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-info w-100 fw-bold text-white">
+                            <i class="bi bi-plus-circle"></i> LƯU KHOA
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-info text-white fw-bold">
+                <i class="bi bi-building-check"></i> DANH SÁCH CÁC KHOA
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã Khoa</th>
+                            <th>Tên Khoa</th>
+                            <th class="text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(danhSachKhoa && danhSachKhoa.length > 0) { %>
+                            <% danhSachKhoa.forEach(function(k) { %>
+                                <tr>
+                                    <td class="fw-bold text-info"><%= k.MaKhoa %></td>
+                                    <td><%= k.TenKhoa %></td>
+                                    <td class="text-center">
+                                        <a href="/khoa/xoa/<%= k._id %>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Xóa khoa này có thể mất dữ liệu lớp liên quan. Bạn chắc chứ?')">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">Chưa có khoa nào. Hãy thêm khoa đầu tiên để tạo database trên Cloud!</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <%-include ('footer')%>
+    </div>
+    <%-include ('javascript')%>
+</body>
+</html>

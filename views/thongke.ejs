@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%-include ('header')%> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container mt-4">
+        <%-include ('navbar')%>
+        <h2 class="mt-3">Thống kê sinh viên theo Khoa</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-bordered mt-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tên Khoa</th>
+                            <th>Số lượng sinh viên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% data.forEach(item => { %>
+                            <tr>
+                                <td><%= item._id || 'Chưa xác định' %></td>
+                                <td><span class="badge bg-primary"><%= item.count %> SV</span></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vẽ biểu đồ Chart.js
+        const ctx = document.getElementById('myChart');
+        const labels = <%- JSON.stringify(data.map(i => i._id || 'N/A')) %>;
+        const values = <%- JSON.stringify(data.map(i => i.count)) %>;
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượng SV',
+                    data: values,
+                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

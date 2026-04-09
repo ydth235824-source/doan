@@ -1,0 +1,23 @@
+{
+  "name": "doan",
+  "version": "1.0.0",
+  "description": "Ứng dụng quản lý sinh viên - MongoDB Atlas",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node index.js"
+  },
+  "author": "Nguyễn Thị Như Ý",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.19.0",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
