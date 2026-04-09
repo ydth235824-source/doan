@@ -11,6 +11,7 @@
     <div class="container">
         <%-include ('navbar')%>
 
+        <% if (user && user.role === 'admin') { %>
         <div class="card mt-3 shadow border-start border-info border-4">
             <div class="card-header bg-white fw-bold text-info">
                 <i class="bi bi-building-add"></i> THÊM KHOA MỚI
@@ -33,6 +34,7 @@
                 </form>
             </div>
         </div>
+        <% } %>
 
         <div class="card mt-4 shadow">
             <div class="card-header bg-info text-white fw-bold">
@@ -44,7 +46,9 @@
                         <tr>
                             <th>Mã Khoa</th>
                             <th>Tên Khoa</th>
-                            <th class="text-center">Thao tác</th>
+                            <% if (user && user.role === 'admin') { %>
+                                <th class="text-center">Thao tác</th>
+                            <% } %>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,16 +57,19 @@
                                 <tr>
                                     <td class="fw-bold text-info"><%= k.MaKhoa %></td>
                                     <td><%= k.TenKhoa %></td>
+                                    
+                                    <% if (user && user.role === 'admin') { %>
                                     <td class="text-center">
                                         <a href="/khoa/xoa/<%= k._id %>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Xóa khoa này có thể mất dữ liệu lớp liên quan. Bạn chắc chứ?')">
                                             <i class="bi bi-trash"></i> Xóa
                                         </a>
                                     </td>
+                                    <% } %>
                                 </tr>
                             <% }) %>
                         <% } else { %>
                             <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">Chưa có khoa nào. Hãy thêm khoa đầu tiên để tạo database trên Cloud!</td>
+                                <td colspan="<%= (user && user.role === 'admin') ? 3 : 2 %>" class="text-center py-4 text-muted">Chưa có khoa nào.</td>
                             </tr>
                         <% } %>
                     </tbody>

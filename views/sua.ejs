@@ -46,20 +46,18 @@
                                             pattern="[A-Za-z]{3}\d{6}"
                                             title="MSSV phải gồm 3 chữ và 6 số (VD: DTH235824)" required>
                                     </div>
-                                    <small class="text-danger">* Lưu ý: Kiểm tra kỹ định dạng 3 chữ 6 số trước khi cập
-                                        nhật.</small>
+                                    <small class="text-danger">* Lưu ý: Kiểm tra kỹ định dạng 3 chữ 6 số trước khi cập nhật.</small>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Họ Và Tên</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input type="text" name="HoTen" class="form-control" value="<%= sv.HoTen %>"
-                                            required>
+                                        <input type="text" name="HoTen" class="form-control" value="<%= sv.HoTen %>" required>
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
+                                <div class="mb-3">
                                     <label class="form-label fw-bold">Lớp Sinh Hoạt</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-mortarboard"></i></span>
@@ -69,7 +67,22 @@
                                                 <option value="<%= l.MaLop %>" <%=sv.Lop===l.MaLop ? 'selected' : '' %>>
                                                     <%= l.TenLop %> (<%= l.MaLop %>)
                                                 </option>
-                                                <% }) %>
+                                            <% }) %>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Khoa</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                        <select name="Khoa" class="form-select" required>
+                                            <option value="">-- Chọn khoa --</option>
+                                            <% danhSachKhoa.forEach(k => { %>
+                                                <option value="<%= k.TenKhoa %>" <%= sv.Khoa === k.TenKhoa ? 'selected' : '' %>>
+                                                    <%= k.TenKhoa %>
+                                                </option>
+                                            <% }) %>
                                         </select>
                                     </div>
                                 </div>

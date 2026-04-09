@@ -11,8 +11,8 @@ const khoaRouter = require('./routers/khoa');
 // 2. Kết nối MongoDB
 const uri = 'mongodb://user:12345@ac-0wqq6gp-shard-00-02.jsk0mou.mongodb.net:27017/doan?ssl=true&authSource=admin';
 mongoose.connect(uri)
-    .then(() => console.log('✅ Đã kết nối thành công tới MongoDB.'))
-    .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
+    .then(() => console.log('Đã kết nối thành công tới MongoDB.'))
+    .catch(err => console.error(' Lỗi kết nối MongoDB:', err));
 
 // 3. Cấu hình View Engine & Middleware
 app.set('views', './views');
@@ -91,5 +91,5 @@ app.get('/debug-db', async (req, res) => {
 // 7. Chạy Server
 const PORT = process.env.PORT || 3000; // Render sẽ dùng PORT của nó, máy ông dùng 3000
 app.listen(PORT, () => {
-    console.log(`🚀 Server đang chạy tại cổng: ${PORT}`);
+    console.log(`Server đang chạy tại cổng: ${PORT}`);
 });

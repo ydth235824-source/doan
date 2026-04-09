@@ -15,140 +15,142 @@
     <div class="container">
         <%- include('navbar') %>
 
+        <div class="card mt-3 shadow border-0">
+            <div class="card-body">
+                <form method="GET" action="/" class="row g-2">
+                    <div class="col-md-5">
+                        <input type="text" name="search" class="form-control" placeholder="🔍 Nhập tên hoặc MSSV..."
+                            value="<%= query?.search || '' %>">
+                    </div>
+                    <div class="col-md-4">
+                        <select name="lop" class="form-select">
+                            <option value="">-- Tất cả lớp --</option>
+                            <% if (Array.isArray(danhSachLop)) { %>
+                                <% danhSachLop.forEach(function(l) { %>
+                                    <option value="<%= l.MaLop %>" <%=query?.lop==l.MaLop ? 'selected' : '' %>>
+                                        <%= l.TenLop %>
+                                    </option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Tìm</button>
+                        <a href="/" class="btn btn-secondary w-100">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <% if (user && user.role==='admin' ) { %>
             <div class="card mt-3 shadow border-0">
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bi bi-person-plus"></i> THÊM SINH VIÊN MỚI (Quyền Admin)
+                </div>
                 <div class="card-body">
-                    <form method="GET" action="/" class="row g-2">
-                        <div class="col-md-5">
-                            <input type="text" name="search" class="form-control" placeholder="🔍 Nhập tên hoặc MSSV..."
-                                value="<%= query?.search || '' %>">
+                    <form action="/them" method="POST" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">MSSV</label>
+                            <input type="text" name="MSSV" class="form-control" placeholder="B2012345" required>
                         </div>
                         <div class="col-md-4">
-                            <select name="lop" class="form-select">
-                                <option value="">-- Tất cả lớp --</option>
+                            <label class="form-label fw-bold">Họ và Tên</label>
+                            <input type="text" name="HoTen" class="form-control" placeholder="Nguyễn Văn A" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Lớp</label>
+                            <select name="Lop" class="form-select" required>
+                                <option value="">-- Chọn lớp --</option>
                                 <% if (Array.isArray(danhSachLop)) { %>
                                     <% danhSachLop.forEach(function(l) { %>
-                                        <option value="<%= l.MaLop %>" <%=query?.lop==l.MaLop ? 'selected' : '' %>><%=
-                                                l.TenLop %>
-                                        </option>
-                                        <% }) %>
-                                            <% } %>
+                                        <option value="<%= l.MaLop %>"><%= l.TenLop %></option>
+                                    <% }) %>
+                                <% } %>
                             </select>
                         </div>
-                        <div class="col-md-3 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i>
-                                Tìm</button>
-                            <a href="/" class="btn btn-secondary w-100">Reset</a>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Khoa</label>
+                            <select name="Khoa" class="form-select" required>
+                                <option value="">-- Chọn khoa --</option>
+                                <% if (Array.isArray(danhSachKhoa)) { %>
+                                    <% danhSachKhoa.forEach(function(k) { %>
+                                        <option value="<%= k.TenKhoa %>">
+                                            <%= k.TenKhoa %>
+                                        </option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        </div>
+
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-success fw-bold">
+                                <i class="bi bi-save"></i> LƯU VÀO DATABASE
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
+        <% } %>
 
-            <% if (user && user.role==='admin' ) { %>
-                <div class="card mt-3 shadow border-0">
-                    <div class="card-header bg-primary text-white fw-bold">
-                        <i class="bi bi-person-plus"></i> THÊM SINH VIÊN MỚI (Quyền Admin)
-                    </div>
-                    <div class="card-body">
-                        <form action="/them" method="POST" class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">MSSV</label>
-                                <input type="text" name="MSSV" class="form-control" placeholder="B2012345" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Họ và Tên</label>
-                                <input type="text" name="HoTen" class="form-control" placeholder="Nguyễn Văn A"
-                                    required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-bold">Lớp</label>
-                                <select name="Lop" class="form-select" required>
-                                    <option value="">-- Chọn lớp --</option>
-                                    <% danhSachLop.forEach(function(l) { %>
-                                        <option value="<%= l.MaLop %>">
-                                            <%= l.TenLop %>
-                                        </option>
-                                        <% }) %>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Khoa</label>
-                                <input type="text" name="Khoa" class="form-control" placeholder="CNTT" required>
-                            </div>
-                            <div class="col-12 text-end">
-                                <button type="submit" class="btn btn-success fw-bold">
-                                    <i class="bi bi-save"></i> LƯU VÀO DATABASE
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <% } %>
+        <hr class="mt-5">
+        <h3 class="fw-bold text-center text-uppercase text-secondary">Danh sách sinh viên theo lớp</h3>
 
-                    <hr class="mt-5">
-                    <h3 class="fw-bold text-center text-uppercase text-secondary">Danh sách sinh viên theo lớp</h3>
-
-                    <% if (Array.isArray(danhSachLop) && danhSachLop.length> 0) { %>
-                        <% danhSachLop.forEach(function(l) { %>
-                            <% var svTheoLop=danhSach.filter(s=> s.Lop === l.MaLop); %>
-                                <% if (svTheoLop.length> 0) { %>
-                                    <div class="card mt-4 shadow border-0">
-                                        <div
-                                            class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
-                                            <span><i class="bi bi-mortarboard"></i> LỚP: <%= l.TenLop %> (<%= l.MaLop %>
-                                                        )</span>
-                                            <span class="badge bg-primary text-white">
-                                                <%= svTheoLop.length %> Sinh viên
-                                            </span>
-                                        </div>
-                                        <div class="card-body p-0">
-                                            <table class="table table-hover mb-0">
-                                                <thead class="table-light text-secondary">
-                                                    <tr>
-                                                        <th style="width: 20%">MSSV</th>
-                                                        <th style="width: 35%">Họ Tên</th>
-                                                        <th style="width: 30%">Khoa</th>
-                                                        <% if (user && user.role==='admin' ) { %>
-                                                            <th class="text-center" style="width: 15%">Thao tác</th>
-                                                            <% } %>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <% svTheoLop.forEach(function(sv) { %>
-                                                        <tr>
-                                                            <td class="fw-bold text-primary">
-                                                                <%= sv.MSSV %>
-                                                            </td>
-                                                            <td>
-                                                                <%= sv.HoTen %>
-                                                            </td>
-                                                            <td><span class="badge bg-info text-dark text-uppercase">
-                                                                    <%= sv.Khoa %>
-                                                                </span></td>
-
-                                                            <% if (user && user.role==='admin' ) { %>
-                                                                <td class="text-center">
-                                                                    <a href="/sua/<%= sv._id %>"
-                                                                        class="btn btn-warning btn-sm shadow-sm">
-                                                                        <i class="bi bi-pencil"></i>
-                                                                    </a>
-                                                                    <a href="/xoa/<%= sv._id %>"
-                                                                        class="btn btn-danger btn-sm shadow-sm"
-                                                                        onclick="return confirm('Xóa sinh viên <%= sv.HoTen %>?')">
-                                                                        <i class="bi bi-trash"></i>
-                                                                    </a>
-                                                                </td>
-                                                                <% } %>
-                                                        </tr>
-                                                        <% }) %>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <% } %>
-                                        <% }) %>
+        <% if (Array.isArray(danhSachLop) && danhSachLop.length> 0) { %>
+            <% danhSachLop.forEach(function(l) { %>
+                <% var svTheoLop = danhSach.filter(s => s.Lop === l.MaLop); %>
+                <% if (svTheoLop.length > 0) { %>
+                    <div class="card mt-4 shadow border-0">
+                        <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-mortarboard"></i> LỚP: <%= l.TenLop %> (<%= l.MaLop %>)</span>
+                            <span class="badge bg-primary text-white">
+                                <%= svTheoLop.length %> Sinh viên
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light text-secondary">
+                                    <tr>
+                                        <th style="width: 20%">MSSV</th>
+                                        <th style="width: 35%">Họ Tên</th>
+                                        <th style="width: 30%">Khoa</th>
+                                        <% if (user && user.role==='admin' ) { %>
+                                            <th class="text-center" style="width: 15%">Thao tác</th>
+                                        <% } %>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% svTheoLop.forEach(function(sv) { %>
+                                        <tr>
+                                            <td class="fw-bold text-primary"><%= sv.MSSV %></td>
+                                            <td><%= sv.HoTen %></td>
+                                            <td>
+                                                <span class="badge bg-info text-dark text-uppercase">
+                                                    <%= sv.Khoa %>
+                                                </span>
+                                            </td>
+                                            <% if (user && user.role==='admin' ) { %>
+                                                <td class="text-center">
+                                                    <a href="/sua/<%= sv._id %>" class="btn btn-warning btn-sm shadow-sm">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="/xoa/<%= sv._id %>" class="btn btn-danger btn-sm shadow-sm"
+                                                        onclick="return confirm('Xóa sinh viên <%= sv.HoTen %>?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
                                             <% } %>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <% } %>
+            <% }) %>
+        <% } %>
 
-                                                <%- include('footer') %>
+        <%- include('footer') %>
     </div>
     <%- include('javascript') %>
 </body>

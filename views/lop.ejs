@@ -11,6 +11,7 @@
     <div class="container">
         <%-include ('navbar')%>
 
+        <% if (user && user.role === 'admin') { %>
         <div class="card mt-3 shadow border-start border-success border-4">
             <div class="card-header bg-white fw-bold text-success">
                 <i class="bi bi-plus-square-fill"></i> THÊM LỚP MỚI
@@ -33,6 +34,7 @@
                 </form>
             </div>
         </div>
+        <% } %>
 
         <div class="card mt-4 shadow">
             <div class="card-header bg-success text-white fw-bold">
@@ -44,7 +46,9 @@
                         <tr>
                             <th>Mã Lớp</th>
                             <th>Tên Lớp</th>
-                            <th class="text-center">Thao tác</th>
+                            <% if (user && user.role === 'admin') { %>
+                                <th class="text-center">Thao tác</th>
+                            <% } %>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,16 +57,19 @@
                                 <tr>
                                     <td class="fw-bold text-success"><%= l.MaLop %></td>
                                     <td><%= l.TenLop %></td>
+                                    
+                                    <% if (user && user.role === 'admin') { %>
                                     <td class="text-center">
                                         <a href="/lop/xoa/<%= l._id %>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Xóa lớp này hả?')">
                                             <i class="bi bi-trash"></i> Xóa
                                         </a>
                                     </td>
+                                    <% } %>
                                 </tr>
                             <% }) %>
                         <% } else { %>
                             <tr>
-                                <td colspan="3" class="text-center py-4">Chưa có lớp nào trong danh sách.</td>
+                                <td colspan="<%= (user && user.role === 'admin') ? 3 : 2 %>" class="text-center py-4">Chưa có lớp nào trong danh sách.</td>
                             </tr>
                         <% } %>
                     </tbody>
