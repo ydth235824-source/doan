@@ -5,3 +5,4 @@ node_modules/
 credentials.json
 node_modules
 .env
+google-key.json

@@ -78,7 +78,7 @@ app.get('/export-sheets', async (req, res) => {
         if (students.length === 0) return res.send("<script>alert('Lớp không có sinh viên!'); window.history.back();</script>");
 
         const auth = new google.auth.GoogleAuth({
-            keyFile: './credentials.json',
+            keyFile: './google-key.json',
             scopes: 'https://www.googleapis.com/auth/spreadsheets',
         });
 
