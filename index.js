@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const session = require('express-session');
+const { google } = require('googleapis');
+const ExcelJS = require('exceljs'); 
 
 // 1. Cấu hình các Router
 const sinhVienRouter = require('./routers/sinhvien');
@@ -17,44 +19,32 @@ mongoose.connect(uri)
 // 3. Cấu hình View Engine & Middleware
 app.set('views', './views');
 app.set('view engine', 'ejs');
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
-// 4. Cấu hình Session (Quan trọng: Đặt TRƯỚC router)
+// 4. Cấu hình Session
 app.use(session({
     secret: 'abc123',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // Session tồn tại 1 ngày
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
-// 5. Middleware đẩy user vào Locals (Chỉ cần 1 cái này thôi)
+// 5. Middleware Locals
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
 
-// -----------------------------------------------------------
 // 6. ROUTES HỆ THỐNG
-// -----------------------------------------------------------
-
-// GET: Trang Login (Giao diện mới)
 app.get('/login', (req, res) => {
-    // Nếu đã đăng nhập rồi thì cho về trang chủ luôn
-    if (req.session.user) {
-        return res.redirect('/');
-    }
-    // Gọi file login.ejs trong thư mục views
+    if (req.session.user) return res.redirect('/');
     res.render('login'); 
 });
 
-// POST: Xử lý đăng nhập
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-
-    // Logic kiểm tra đơn giản
     if (username === 'admin' && password === '123') {
         req.session.user = { username, role: 'admin' };
         res.redirect('/');
@@ -66,30 +56,101 @@ app.post('/login', (req, res) => {
     }
 });
 
-// GET: Đăng xuất
 app.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.log(err);
-        }
-        // Thay vì redirect về /login, mình redirect về trang chủ /
-        res.redirect('/'); 
-    });
+    req.session.destroy(() => res.redirect('/'));
 });
 
-// Sử dụng các Router đã khai báo
 app.use('/', sinhVienRouter);
 app.use('/lop', lopRouter);
 app.use('/khoa', khoaRouter);
 
-app.get('/debug-db', async (req, res) => {
-    const SinhVien = require('./models/sinhvien');
-    const all = await SinhVien.find({});
-    res.json(all); // Nó sẽ hiện toàn bộ những gì đang có trong DB dưới dạng chữ
+// --- XUẤT LÊN GOOGLE SHEETS ---
+app.get('/export-sheets', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.send("<script>alert('Bạn không có quyền!'); window.location='/';</script>");
+    }
+
+    try {
+        const maLopFilter = req.query.lop; 
+        const SinhVien = require('./models/sinhvien');
+        const students = await SinhVien.find({ Lop: maLopFilter });
+
+        if (students.length === 0) return res.send("<script>alert('Lớp không có sinh viên!'); window.history.back();</script>");
+
+        const auth = new google.auth.GoogleAuth({
+            keyFile: './credentials.json',
+            scopes: 'https://www.googleapis.com/auth/spreadsheets',
+        });
+
+        const client = await auth.getClient();
+        const googleSheets = google.sheets({ version: 'v4', auth: client });
+        const spreadsheetId = '1w9W7XLoGwPERS68RrYQ6fGZZyqID2jlurWDHBOIXVf0';
+
+        // Tự tạo tab mới nếu chưa có
+        try {
+            await googleSheets.spreadsheets.batchUpdate({
+                spreadsheetId,
+                resource: { requests: [{ addSheet: { properties: { title: maLopFilter } } }] }
+            });
+        } catch (e) { console.log("Tab đã tồn tại"); }
+
+        const values = students.map(sv => [sv.MSSV, sv.HoTen, sv.Khoa]);
+        values.unshift(['MSSV', 'Họ Và Tên', 'Khoa']);
+
+        await googleSheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: `${maLopFilter}!A1`, 
+            valueInputOption: 'USER_ENTERED',
+            resource: { values },
+        });
+
+        // Báo thành công để trình duyệt ngừng xoay
+        res.send(`<script>alert('Đã đẩy lên Google Sheets lớp ${maLopFilter}!'); window.location='/';</script>`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Lỗi: " + error.message);
+    }
 });
 
+// --- XUẤT FILE VỀ MÁY ---
+app.get('/export-excel', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.send("<script>alert('Bạn không có quyền!'); window.location='/';</script>");
+    }
+
+    try {
+        const maLopFilter = req.query.lop;
+        const SinhVien = require('./models/sinhvien');
+        const students = await SinhVien.find({ Lop: maLopFilter });
+
+        if (students.length === 0) return res.send("<script>alert('Lớp không có sinh viên!'); window.history.back();</script>");
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet(`Lớp ${maLopFilter}`);
+
+        sheet.columns = [
+            { header: 'MSSV', key: 'mssv', width: 15 },
+            { header: 'Họ và Tên', key: 'hoten', width: 30 },
+            { header: 'Khoa', key: 'khoa', width: 25 }
+        ];
+
+        students.forEach(sv => {
+            sheet.addRow({ mssv: sv.MSSV, hoten: sv.HoTen, khoa: sv.Khoa });
+        });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=Lop_${maLopFilter}.xlsx`);
+
+        await workbook.xlsx.write(res);
+        res.end(); // KẾT THÚC REQUEST ĐỂ NGỪNG XOAY
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Lỗi: " + error.message);
+    }
+});
 // 7. Chạy Server
-const PORT = process.env.PORT || 3000; // Render sẽ dùng PORT của nó, máy ông dùng 3000
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server đang chạy tại cổng: ${PORT}`);
 });

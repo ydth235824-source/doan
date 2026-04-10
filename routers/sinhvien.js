@@ -32,17 +32,16 @@ router.get('/', async (req, res) => {
 
         const danhSach = await SinhVien.find(query).sort({ Lop: 1, HoTen: 1 });
         const danhSachLop = await Lop.find();
-        const danhSachKhoa = await khoaModel.find(); // ✅ Đã có khoaModel ở trên nên không lỗi nữa
+        const danhSachKhoa = await khoaModel.find(); //Đã có khoaModel ở trên nên không lỗi nữa
 
         res.render('index', {
-            title: 'Quản Lý Sinh Viên', // ✅ 2. ĐÃ CÓ TITLE ĐỂ HẾT LỖI "title is not defined"
+            title: 'Quản Lý Sinh Viên', // ĐÃ CÓ TITLE ĐỂ HẾT LỖI "title is not defined"
             danhSach,
             danhSachLop,
             danhSachKhoa,
             query: req.query
         });
     } catch (err) {
-        // ✅ 3. PHẢI TRUYỀN TITLE CẢ Ở PHẦN CATCH ĐỂ TRÁNH LỖI KHI CÓ SỰ CỐ DB
         res.render('index', { 
             title: 'Lỗi Hệ Thống',
             danhSach: [], 
@@ -90,7 +89,7 @@ router.get('/sua/:id', isAdmin, async (req, res) => {
     try {
         const sv = await SinhVien.findById(req.params.id);
         const danhSachLop = await Lop.find();
-        const danhSachKhoa = await khoaModel.find(); // ✅ Lấy danh sách khoa từ DB
+        const danhSachKhoa = await khoaModel.find(); //Lấy danh sách khoa từ DB
 
         if (!sv) return res.redirect('/');
 

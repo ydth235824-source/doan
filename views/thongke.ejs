@@ -26,29 +26,5 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-md-6">
-                <canvas id="myChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Vẽ biểu đồ Chart.js
-        const ctx = document.getElementById('myChart');
-        const labels = <%- JSON.stringify(data.map(i => i._id || 'N/A')) %>;
-        const values = <%- JSON.stringify(data.map(i => i.count)) %>;
-
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Số lượng SV',
-                    data: values,
-                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
-                }]
-            }
-        });
-    </script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-// Đảm bảo file models tên là student.js nằm trong thư mục models
 var sinhVienModel = require('../models/student'); 
 
 // --- 1. DANH SÁCH SINH VIÊN (Trang chủ) ---
@@ -15,7 +14,6 @@ router.get('/', async (req, res) => {
         });
     } catch (err) {
         console.log("Lỗi lấy danh sách:", err);
-        // Nếu lỗi, vẫn cho hiện trang index với danh sách rỗng để không bị sập web
         res.render('index', { 
             title: 'Trang chủ Quản lý', 
             danhSach: [] 
@@ -24,7 +22,6 @@ router.get('/', async (req, res) => {
 });
 
 // --- 2. XỬ LÝ THÊM SINH VIÊN ---
-// Bạn dùng chung form ở trang chủ nên chỉ cần Route POST này thôi
 router.post('/them', async (req, res) => {
     try {
         var svMoi = new sinhVienModel(req.body);
