@@ -139,7 +139,46 @@ app.get('/export-sheets', async (req, res) => {
 
 // Giữ nguyên Route export-excel của ông vì nó chạy tốt
 app.get('/export-excel', async (req, res) => {
-    // ... code cũ của ông giữ nguyên ...
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.send("<script>alert('Bạn không có quyền!'); window.location='/';</script>");
+    }
+
+    try {
+        const maLopFilter = req.query.lop;
+        const SinhVien = require('./models/sinhvien');
+        const students = await SinhVien.find({ Lop: maLopFilter });
+
+        if (students.length === 0) {
+            return res.send("<script>alert('Lớp không có sinh viên!'); window.history.back();</script>");
+        }
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet(`Lớp ${maLopFilter}`);
+
+        sheet.columns = [
+            { header: 'MSSV', key: 'mssv', width: 15 },
+            { header: 'Họ và Tên', key: 'hoten', width: 30 },
+            { header: 'Khoa', key: 'khoa', width: 25 }
+        ];
+
+        students.forEach(sv => {
+            sheet.addRow({ mssv: sv.MSSV, hoten: sv.HoTen, khoa: sv.Khoa });
+        });
+
+        // THIẾT LẬP HEADER CHUẨN
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=Lop_${maLopFilter}.xlsx`);
+
+        //Dùng await để đảm bảo ghi xong dữ liệu mới kết thúc
+        await workbook.xlsx.write(res);
+        
+        // Sau khi ghi xong, KHÔNG dùng res.end() thủ công, trình duyệt sẽ tự đóng luồng
+    } catch (error) {
+        console.error("Lỗi Export Excel:", error);
+        if (!res.headersSent) {
+            res.status(500).send("Lỗi hệ thống: " + error.message);
+        }
+    }
 });
 
 app.use('/', sinhVienRouter);
