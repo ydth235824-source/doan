@@ -6,3 +6,4 @@ credentials.json
 node_modules
 .env
 google-key.json
+secret-api-key.json
