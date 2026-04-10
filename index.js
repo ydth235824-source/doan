@@ -37,6 +37,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// Thêm dòng này ở đầu file (ví dụ dưới dòng const app = express();)
+let adminPassword = '123';
+let adminUser = 'admin';     
+
 // 6. ROUTES HỆ THỐNG
 app.get('/login', (req, res) => {
     if (req.session.user) return res.redirect('/');
@@ -45,15 +49,14 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    if (username === 'admin' && password === '123') {
+
+    // So sánh với 2 biến linh hoạt
+    if (username === adminUser && password === adminPassword) {
         req.session.user = { username, role: 'admin' };
-        res.redirect('/');
-    } else if (username && password) {
-        req.session.user = { username, role: 'user' };
-        res.redirect('/');
-    } else {
-        res.send("<script>alert('Vui lòng nhập đầy đủ!'); window.location='/login';</script>");
-    }
+        return res.redirect('/');
+    } 
+    
+    res.send("<script>alert('Sai tài khoản hoặc mật khẩu!'); window.location='/login';</script>");
 });
 
 app.get('/logout', (req, res) => {
@@ -149,6 +152,41 @@ app.get('/export-excel', async (req, res) => {
         res.status(500).send("Lỗi: " + error.message);
     }
 });
+
+// Route hiển thị trang cài đặt
+app.get('/settings', (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.redirect('/login');
+    }
+    // PHẢI thêm biến title vào đây
+    res.render('settings', { 
+        user: req.session.user, 
+        title: 'Cài đặt tài khoản' 
+    }); 
+});
+
+// Đổi từ /update-settings thành /settings cho khớp với Form
+app.post('/settings', async (req, res) => {
+    const { newName, newPassword } = req.body; // Lấy cả tên mới và mk mới
+    
+    try {
+        if (newName && newName.trim() !== "" && newPassword && newPassword.trim() !== "") {
+            // Cập nhật cả 2 biến toàn cục
+            adminUser = newName; 
+            adminPassword = newPassword; 
+
+            // Cập nhật lại session để menu hiển thị tên mới ngay lập tức
+            req.session.user.username = newName;
+
+            res.send("<script>alert('Cập nhật thành công! Tên mới: " + newName + "'); window.location='/';</script>");
+        } else {
+            res.send("<script>alert('Không được để trống tên hoặc mật khẩu!'); window.history.back();</script>");
+        }
+    } catch (error) {
+        res.status(500).send("Lỗi: " + error.message);
+    }
+});
+
 // 7. Chạy Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
