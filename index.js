@@ -187,6 +187,25 @@ app.post('/settings', async (req, res) => {
     }
 });
 
+// --- ĐOẠN CODE CẤU HÌNH GOOGLE SHEETS MỚI ---
+let googleKey;
+try {
+    if (process.env.GOOGLE_KEY_DATA) {
+        // Nếu chạy trên Render (Lấy từ Environment Group)
+        googleKey = JSON.parse(process.env.GOOGLE_KEY_DATA);
+    } else {
+        // Nếu chạy ở máy local (Đọc file json)
+        googleKey = require('./secret-api-key.json');
+    }
+} catch (e) {
+    console.error("Lỗi cấu hình Google Key:", e.message);
+}
+
+const auth = new google.auth.GoogleAuth({
+    credentials: googleKey, // Dùng credentials thay vì keyFile
+    scopes: 'https://www.googleapis.com/auth/spreadsheets',
+});
+
 // 7. Chạy Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
